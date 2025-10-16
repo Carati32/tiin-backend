@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Logs</title>
+
+    <link rel="stylesheet" href="../style/cadastro_log.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/css/bootstrap.min.css"
+        integrity="sha512-2bBQCjcnw658Lho4nlXJcc6WkV/UxpE/sAokbXPxQNGqmNdQrWqtw26Ns9kFF/yG792pKR1Sx8/Y1Lf1XN4GKA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.min.js"
+        integrity="sha512-nKXmKvJyiGQy343jatQlzDprflyB5c+tKCzGP3Uq67v+lmzfnZUi/ZT+fc6ITZfSC5HhaBKUIvr/nTLCV+7F+Q=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.bundle.min.js"
+        integrity="sha512-HvOjJrdwNpDbkGJIG2ZNqDlVqMo77qbs4Me4cah0HoDrfhrbA+8SBlZn1KrvAQw7cILLPFJvdwIgphzQmMm+Pw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+
+    <div class="container mt-5">
+        <form id="frmLog">
+            <h3>Cadastro de Log</h3>
+            <form>
+                <div class="mb-3">
+                    <label for="categoria" class="form-label">Categoria</label>
+                    <input type="text" class="form-control" id="categoria">
+                </div>
+                <div class="mb-3">
+                    <label for="horas_trabalhadas" class="form-label">Horas Trabalhadas</label>
+                    <input type="number" class="form-control" id="horas_trabalhadas">
+                </div>
+                <div class="mb-3">
+                    <label for="linhas_codigo" class="form-label">Linhas de codigo</label>
+                    <input type="number" class="form-control" id="linhas_codigo">
+                </div>
+                <div class="mb-3">
+                    <label for="bugs_corrigidos" class="form-label">Bugs Corrigidos</label>
+                    <input type="number" class="form-control" id="bugs_corrigidos">
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </form>
+        </form>
+    </div>
+
+
+</body>
+<script>
+
+    document.getElementById('frmLog').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const categoria = document.getElementById('categoria').value;
+        const horas_trabalhadas = document.getElementById('horas_trabalhadas').value;
+        const linhas_codigo = document.getElementById('linhas_codigo').value;
+        const bugs_corrigidos = document.getElementById('bugs_corrigidos').value;
+
+        const url = "http://localhost:3000/logs";
+
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": 'application/json'
+            },
+            body: JSON.stringify({categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos })
+        })
+            .then((res) => {
+                if (!res.ok)
+                    alert("Erro ao fazer cadastro");
+                return res.json();
+            }).then((data) => {
+                if (data)
+                    return alert("Cadastro bem sucedido!")
+            })
+            .catch((error) => console.log(error))
+
+    });
+
+</script>
+
+</html>
