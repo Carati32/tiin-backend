@@ -18,6 +18,123 @@ CREATE TABLE lgs(
 );
 
 
+CREATE DATABASE senai;
+USE senai;
+
+CREATE TABLE usuario(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100),
+    idade INT,
+    email VARCHAR(100) UNIQUE,
+    senha VARCHAR(100)
+);
+
+CREATE TABLE lgs (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	categoria TEXT,
+    horas_trabalhadas INT,
+    linhas_codigo INT,
+    bugs_corrigidos INT
+);
+
+
+CREATE TABLE `like` (
+  `log_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  KEY `fk_log_idx` (`log_id`),
+  KEY `fk_user_idx` (`user_id`),
+  CONSTRAINT `fk_log` FOREIGN KEY (`log_id`) REFERENCES `lgs` (`id`),
+  CONSTRAINT `fk_user` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id`)
+);
+
+insert into senai.like(log_id, user_id) values (1,1);
+insert into senai.like(log_id, user_id) values (2,1);
+insert into senai.like(log_id, user_id) values (1,1);
+insert into senai.like(log_id, user_id) values (1,1);
+insert into senai.like(log_id, user_id) values (2,1);
+insert into senai.like(log_id, user_id) values (1,1);
+
+
+CREATE TABLE `comment`(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	id_log INT,
+    id_user INT,
+    comments VARCHAR(255),
+	FOREIGN KEY (id_user)
+    REFERENCES usuario (id),
+	FOREIGN KEY (id_log)
+    REFERENCES lgs (id)
+);
+insert into senai.`comment`(id_log, id_user) values (3,1);
+
+
+INSERT INTO usuario (nome,idade,email,senha)
+VALUES
+('Yuri', 17, 'Yuri@gmail.com', '123456789'),
+('Jully', 18, 'Jully@gmail.com', '987654321'),
+('Yuriqwe', 117, 'Yurasdi@gmail.com', '123213456789');
+
+SELECT * FROM usuario; 
+
+INSERT INTO lgs (categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos)
+VALUES
+('Sistema', 123, 432, 200),
+('Vazio infinito', 1000, 8888, 0);
+SELECT * FROM lgs;
+
+SELECT distinct(categoria) FROM lgs;
+
+SELECT * FROM `like`;
+
+ 
+SELECT
+	lgs.id,
+	lgs.categoria,
+	lgs.horas_trabalhadas,
+	lgs.linhas_codigo,
+	lgs.bugs_corrigidos,
+	COUNT(senai.like.log_id) as likes,
+	COUNT(senai.comment.id_log) as comments
+
+    FROM
+      senai.lgs 
+    left JOIN senai.like
+    ON senai.like.log_id = senai.lgs.id
+	left JOIN senai.comment
+    ON senai.comment.id_log = senai.lgs.id
+    GROUP BY
+    lgs.id,
+	lgs.categoria,
+	lgs.horas_trabalhadas,
+	lgs.linhas_codigo,
+	lgs.bugs_corrigidos;
+      
+-- Outro jeito melhor de fazer o que está em cima
+
+      SELECT 
+      lgs.id,
+      lgs.categoria,
+      lgs.horas_trabalhadas,
+      lgs.linhas_codigo,
+      lgs.bugs_corrigidos,
+      (SELECT COUNT(*)
+      FROM
+        senai.like
+        WHERE senai.like.log_id = lgs.id) as likes,
+      (SELECT COUNT(*)
+      FROM senai.comment
+      WHERE senai.comment.log_id = lgs.id) as qnt_comments  
+      FROM
+      senai.lgs
+        ORDER BY 
+          senai.lgs.id asc 
+        LIMIT ? 
+        OFFSET ?
+        
+      
+      
+
+
 USE devhub;
 INSERT INTO lgs (categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos) VALUES ('Desenvolvimento de Gameplay', 22, 1850, 2);
 INSERT INTO lgs (categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos) VALUES ('Arte e Design', 30, 45, 0);
