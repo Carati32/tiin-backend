@@ -130,7 +130,26 @@ app.get("/logs", async (req, res) => {
 
   try {
     const [results] = await pool.query(
-      `SELECT * FROM lgs LIMIT ? OFFSET ?;`,
+      `SELECT 
+      log.id,
+      log.categoria,
+      log.horas_trabalhadas,
+      log.linhas_codigo,
+      log.bugs_corrigidos,
+      (SELECT COUNT (*)
+      FROM
+        senai.like
+        WHERE senai.like.log_id = lgs.id) as likes,
+      (SELECT COUNT(*)
+      FROM senai.comment
+      WHERE senai.comment.log_id = lgs.id) as qnt_comments  
+      FROM
+      senai.lgs
+        ORDER BY 
+          senai.log.id asc 
+        LIMIT ? 
+        OFFSET ?
+        ; `,
       [quantidade, offset]
     );
     res.send(results);
@@ -161,6 +180,27 @@ app.post("/logs", async (req, res) => {
     console.log(error);
   }
 });
+
+app.post("/likes", async (req, res) => {
+  try {
+    const { body } = req;
+    const [results] = await pool.query(
+      "INSERT INTO like (log_id, user_id) VALUES (?, ?)",
+      [
+        body.log_id,
+        body.user_id,
+      ]
+    );
+    const [likeCriado] = await pool.query(
+      "SELECT * FROM like WHERE id=?",
+      results.insertId
+    );
+    res.status(201).json(likeCriado);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 
 app.listen(3000, () => {
   console.log(`Servidor rodando na porta: 3000`);
