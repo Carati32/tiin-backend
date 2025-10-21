@@ -5,7 +5,7 @@ const pool = await mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "senai",
-  database: "devhub",
+  database: "senai",
 });
 
 const app = express();
@@ -123,11 +123,9 @@ app.post("/login", async (req, res) => {
 // LOGS
 app.get("/logs", async (req, res) => {
   const { query } = req;
-
-  const pagina = Math.max(0, (Number(query.pagina) || 1) - 1);
-  const quantidade = Math.max(1, Number(query.quantidade) || 10);
+  const pagina = Number(query.pagina) - 1;
+  const quantidade = Number(query.quantidade);
   const offset = pagina * quantidade;
-
   try {
     const [results] = await pool.query(
       `SELECT 
@@ -163,12 +161,13 @@ app.post("/logs", async (req, res) => {
   try {
     const { body } = req;
     const [results] = await pool.query(
-      "INSERT INTO lgs(categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos) VALUES (?, ?, ?, ?)",
+      "INSERT INTO lgs(id_user ,categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos) VALUES (?, ?, ?, ?, ?)",
       [
+        body.id_user,
         body.categoria,
         body.horas_trabalhadas,
         body.linhas_codigo,
-        body.bugs_corrigidos,
+        body.bugs_corrigidos
       ]
     );
     const [logCriado] = await pool.query(
@@ -200,6 +199,24 @@ app.post("/likes", async (req, res) => {
     console.log(error);
   }
 });
+
+
+app.delete("/likes", async (req, res) => {
+  try {
+    const { log_id,user_id } = req.query;
+    const [results] = await pool.query(
+      "DELETE FROM `like` WHERE log_id = ? AND user_id = ? ",
+     [ Number(log_id),
+      Number(user_id)]
+    );
+    res.status(200).send("like removido!", results);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+
+
 
 
 app.listen(3000, () => {
