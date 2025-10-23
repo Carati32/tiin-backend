@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+
+<body>
+    <table class="table table-dark table-striped-columns">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Categoria</th>
+                <th>Horas Trabalhadas</th>
+                <th>Linhas de Código</th>
+                <th>Bugs Corrigidos</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+          <li class="page-item disabled">
+            <a class="page-link">Previous</a>
+          </li>
+          <li class="page-item"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item">
+            <a class="page-link" href="#">Next</a>
+          </li>
+        </ul>
+      </nav>
+  </nav>
+    <script>
+        const url = 'http://localhost:3000/logs';
+
+        const TabelaCorpo = document.querySelector('tbody');
+
+        async function buscarLogs() {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Erro na requisição: ${response.status}`);
+                }
+                const logs = await response.json();
+
+                TabelaCorpo.innerHTML = '';
+
+                logs.forEach(lgs => {
+                    const linha = document.createElement('tr');
+                    linha.innerHTML = `
+                        <td>${lgs.id}</td>
+                        <td>${lgs.categoria}</td>
+                        <td>${lgs.horas_trabalhadas}</td>
+                        <td>${lgs.linhas_codigo}</td>
+                        <td>${lgs.bugs_corrigidos}</td>
+                    `;
+                    TabelaCorpo.appendChild(linha);
+                });
+
+            } catch (error) {
+                console.log('Falha ao buscar os logs:', error);
+                TabelaCorpo.innerHTML = `<tr><td colspan="5">Erro ao carregar os dados.</td></tr>`;
+            }
+        }
+        buscarLogs()
+</script>
+</body>
+
+</html>

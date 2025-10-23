@@ -123,28 +123,28 @@ app.post("/login", async (req, res) => {
 // LOGS
 app.get("/logs", async (req, res) => {
   const { query } = req;
-  const pagina = Number(query.pagina) - 1;
-  const quantidade = Number(query.quantidade);
+  const pagina = Math.max(0, (Number(query.pagina) || 1) - 1);
+  const quantidade = Math.max(1, Number(query.quantidade) ||10);
   const offset = pagina * quantidade;
   try {
     const [results] = await pool.query(
       `SELECT 
-      log.id,
-      log.categoria,
-      log.horas_trabalhadas,
-      log.linhas_codigo,
-      log.bugs_corrigidos,
-      (SELECT COUNT (*)
+      lgs.id,
+      lgs.categoria,
+      lgs.horas_trabalhadas,
+      lgs.linhas_codigo,
+      lgs.bugs_corrigidos,
+      (SELECT COUNT(*)
       FROM
-        senai.like
+        senai.like 
         WHERE senai.like.log_id = lgs.id) as likes,
       (SELECT COUNT(*)
       FROM senai.comment
-      WHERE senai.comment.log_id = lgs.id) as qnt_comments  
+      WHERE senai.comment.id_log = lgs.id) as qnt_comments  
       FROM
       senai.lgs
         ORDER BY 
-          senai.log.id asc 
+          senai.lgs.id asc 
         LIMIT ? 
         OFFSET ?
         ; `,
