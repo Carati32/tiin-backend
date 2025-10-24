@@ -10,68 +10,79 @@
 </head>
 
 <body>
-    <table class="table table-dark table-striped-columns">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Categoria</th>
-                <th>Horas Trabalhadas</th>
-                <th>Linhas de Código</th>
-                <th>Bugs Corrigidos</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="container my-4">
+        <div class="row justify-content-center g-4">
+          <div class="col-12 col-md-10 col-lg-8">
+            <div class="card text-dark">
+              <div class="card-body">
+                <table class="table table-dark table-striped-columns table-sm mb-0">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Categoria</th>
+                      <th>Horas Trabalhadas</th>
+                      <th>Linhas de Código</th>
+                      <th>Bugs Corrigidos</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+ 
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        </tbody>
-    </table>
-    <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-center">
-          <li class="page-item disabled">
-            <a class="page-link">Previous</a>
-          </li>
-          <li class="page-item"><a class="page-link" href="#">1</a></li>
-          <li class="page-item"><a class="page-link" href="#">2</a></li>
-          <li class="page-item"><a class="page-link" href="#">3</a></li>
-          <li class="page-item">
-            <a class="page-link" href="#">Next</a>
-          </li>
-        </ul>
-      </nav>
-  </nav>
-    <script>
-        const url = 'http://localhost:3000/logs';
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                    <a class="page-link">Previous</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
 
-        const TabelaCorpo = document.querySelector('tbody');
+        <script>
+            const url = 'http://localhost:3000/logs';
 
-        async function buscarLogs() {
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Erro na requisição: ${response.status}`);
-                }
-                const logs = await response.json();
+            const TabelaCorpo = document.querySelector('tbody');
 
-                TabelaCorpo.innerHTML = '';
+            async function buscarLogs() {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`Erro na requisição: ${response.status}`);
+                    }
+                    const logs = await response.json();
 
-                logs.forEach(lgs => {
-                    const linha = document.createElement('tr');
-                    linha.innerHTML = `
+                    TabelaCorpo.innerHTML = '';
+
+                    logs.forEach(lgs => {
+                        const linha = document.createElement('tr');
+                        linha.innerHTML = `
                         <td>${lgs.id}</td>
                         <td>${lgs.categoria}</td>
                         <td>${lgs.horas_trabalhadas}</td>
                         <td>${lgs.linhas_codigo}</td>
                         <td>${lgs.bugs_corrigidos}</td>
                     `;
-                    TabelaCorpo.appendChild(linha);
-                });
+                        TabelaCorpo.appendChild(linha);
+                    });
 
-            } catch (error) {
-                console.log('Falha ao buscar os logs:', error);
-                TabelaCorpo.innerHTML = `<tr><td colspan="5">Erro ao carregar os dados.</td></tr>`;
+                } catch (error) {
+                    console.log('Falha ao buscar os logs:', error);
+                    TabelaCorpo.innerHTML = `<tr><td colspan="5">Erro ao carregar os dados.</td></tr>`;
+                }
             }
-        }
-        buscarLogs()
-</script>
+            buscarLogs()
+        </script>
 </body>
 
 </html>

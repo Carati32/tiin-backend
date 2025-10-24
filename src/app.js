@@ -124,7 +124,7 @@ app.post("/login", async (req, res) => {
 app.get("/logs", async (req, res) => {
   const { query } = req;
   const pagina = Math.max(0, (Number(query.pagina) || 1) - 1);
-  const quantidade = Math.max(1, Number(query.quantidade) ||10);
+  const quantidade = Math.max(1, Number(query.quantidade) || 10);
   const offset = pagina * quantidade;
   try {
     const [results] = await pool.query(
@@ -180,6 +180,117 @@ app.post("/logs", async (req, res) => {
   }
 });
 
+app.get("/logs/horas_trabalhadas/:id", async (req, res) => {
+  const { id } = req.params;
+  const { query } = req;
+
+  const pagina = Math.max(0, (Number(query.pagina) || 1) - 1);
+  const quantidade = Math.max(1, Number(query.quantidade) || 10);
+  const offset = pagina * quantidade;
+
+  try {
+    const [results] = await pool.query(
+      `SELECT 
+          lgs.id,
+          lgs.horas_trabalhadas
+       FROM senai.lgs AS lgs
+       WHERE lgs.id_user = ?
+       ORDER BY lgs.id ASC
+       LIMIT ? OFFSET ?`,
+      [id, quantidade, offset]
+    );
+
+    res.send(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro ao buscar horas trabalhadas do usuário" });
+  }
+});
+
+app.get("/logs/:id", async (req, res) => {
+  const { id } = req.params;
+  const { query } = req;
+
+  const pagina = Math.max(0, (Number(query.pagina) || 1) - 1);
+  const quantidade = Math.max(1, Number(query.quantidade) || 10);
+  const offset = pagina * quantidade;
+
+  try {
+    const [results] = await pool.query(
+      `SELECT 
+        lgs.id,
+        id_user
+        FROM senai.lgs AS lgs
+      WHERE lgs.id_user = ?
+      ORDER BY lgs.id ASC
+      LIMIT ? OFFSET ?`,
+      [id, quantidade, offset]
+    );
+    res.send(results);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro ao buscar logs do usuário" });
+  }
+});
+
+app.get("/logs/bugs/:id", async (req, res) => {
+  const { id } = req.params;
+  const { query } = req;
+
+  const pagina = Math.max(0, (Number(query.pagina) || 1) - 1);
+  const quantidade = Math.max(1, Number(query.quantidade) || 10);
+  const offset = pagina * quantidade;
+
+  try {
+    const [results] = await pool.query(
+      `SELECT 
+        lgs.id,
+        id_user,
+        bugs_corrigidos
+        FROM senai.lgs AS lgs
+      WHERE lgs.id_user = ?
+      ORDER BY lgs.id ASC
+      LIMIT ? OFFSET ?`,
+      [id, quantidade, offset]
+    );
+    res.send(results);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro ao buscar bugs_corrigidos do usuário" });
+  }
+});
+
+app.get("/logs/usuariosfull/:id", async (req, res) => {
+  const { id } = req.params;
+  const { query } = req;
+
+  const pagina = Math.max(0, (Number(query.pagina) || 1) - 1);
+  const quantidade = Math.max(1, Number(query.quantidade) || 10);
+  const offset = pagina * quantidade;
+
+  try {
+    const [results] = await pool.query(
+      `SELECT 
+        lgs.id,
+        id_user,
+        bugs_corrigidos,
+        horas_trabalhadas
+        FROM senai.lgs AS lgs
+      WHERE lgs.id_user = ?
+      ORDER BY lgs.id ASC
+      LIMIT ? OFFSET ?`,
+      [id, quantidade, offset]
+    );
+    res.send(results);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro ao buscar bugs_corrigidos do usuário" });
+  }
+});
+
 app.post("/likes", async (req, res) => {
   try {
     const { body } = req;
@@ -203,10 +314,10 @@ app.post("/likes", async (req, res) => {
 
 app.delete("/likes", async (req, res) => {
   try {
-    const { log_id,user_id } = req.query;
+    const { log_id, user_id } = req.query;
     const [results] = await pool.query(
       "DELETE FROM `like` WHERE log_id = ? AND user_id = ? ",
-     [ Number(log_id),
+      [Number(log_id),
       Number(user_id)]
     );
     res.status(200).send("like removido!", results);
