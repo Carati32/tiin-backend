@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuários</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container my-4">
+        <div class="row justify-content-center g-4">
+            <div class="col-12 col-md-10 col-lg-8">
+                <div class="card text-dark">
+                    <div class="card-body">
+                        <h2 class="card-title text-center mb-4">Lista de Usuários</h2>
+                        <table class="table table-dark table-striped-columns table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Idade</th>
+                                    <th>Email</th>
+                                    <th>Senha</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulário de Edição (Inicialmente oculto) -->
+        <div class="row justify-content-center g-4 mt-4" id="formEdicao" style="display: none;">
+            <div class="col-12 col-md-10 col-lg-8">
+                <div class="card text-dark">
+                    <div class="card-body">
+                        <h3 class="card-title text-center mb-4">Editar Usuário</h3>
+                        <form id="editarFormulario">
+                            <input type="hidden" id="edit-id">
+                            <div class="mb-3">
+                                <label for="edit-nome" class="form-label">Nome</label>
+                                <input type="text" class="form-control" id="edit-nome" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit-idade" class="form-label">Idade</label>
+                                <input type="number" class="form-control" id="edit-idade" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit-email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="edit-email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit-senha" class="form-label">Senha</label>
+                                <input type="password" class="form-control" id="edit-senha" required>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-success">Salvar Alterações</button>
+                                <button type="button" class="btn btn-secondary" onclick="cancelarEdicao()">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const url = 'http://localhost:3000/usuarios';
+        const TabelaCorpo = document.querySelector('tbody');
+        const formEdicao = document.getElementById('formEdicao');
+        const editarFormulario = document.getElementById('editarFormulario');
+
+        async function buscarUsuarios() {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar usuários');
+                }
+                const usuarios = await response.json();
+                popularTabela(usuarios);
+            } catch (error) {
+                console.error("Erro ao buscar usuários:", error);
+                TabelaCorpo.innerHTML = `<tr><td colspan="6" class="text-center">Erro ao carregar usuários.</td></tr>`;
+            }
+        }
+
+        function popularTabela(usuarios) {
+            TabelaCorpo.innerHTML = ''; // Limpa a tabela
+            usuarios.forEach(usuario => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${usuario.id}</td>
+                    <td>${usuario.nome}</td>
+                    <td>${usuario.idade}</td>
+                    <td>${usuario.email}</td>
+                    <td>${usuario.senha}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="editarUsuario(${usuario.id})">Editar</button>
+                    </td>
+                `;
+                TabelaCorpo.appendChild(row);
+            });
+        }
+
+        async function editarUsuario(id) {
+            try {
+                const response = await fetch(`${url}/${id}`);
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar usuário para edição');
+                }
+                const usuario = await response.json();
+                // Preenche o formulário de edição com os dados do usuário
+                document.getElementById('edit-id').value = usuario.id;
+                document.getElementById('edit-nome').value = usuario.nome;
+                document.getElementById('edit-idade').value = usuario.idade;
+                document.getElementById('edit-email').value = usuario.email;
+                document.getElementById('edit-senha').value = usuario.senha;
+                
+                formEdicao.style.display = 'block'; // Exibe o formulário de edição
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            } catch (error) {
+                console.error("Erro ao carregar dados para edição:", error);
+                alert("Não foi possível carregar os dados para edição.");
+            }
+        }
+
+        function cancelarEdicao() {
+            formEdicao.style.display = 'none'; // Oculta o formulário
+            editarFormulario.reset(); // Limpa os campos
+        }
+
+        editarFormulario.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const id = document.getElementById('edit-id').value;
+            const usuarioAtualizado = {
+                nome: document.getElementById('edit-nome').value,
+                idade: parseInt(document.getElementById('edit-idade').value),
+                email: document.getElementById('edit-email').value,
+                senha: document.getElementById('edit-senha').value
+            };
+
+            try {
+                const response = await fetch(`${url}/${id}`, {
+                    method: 'PUT', // Método HTTP para atualização
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(usuarioAtualizado)
+                });
+                if (!response.ok) {
+                    throw new Error('Erro ao salvar as alterações do usuário');
+                }
+                alert("Usuário atualizado com sucesso!");
+                cancelarEdicao();
+                buscarUsuarios(); 
+            } catch (error) {
+                console.error("Erro ao salvar edição:", error);
+                alert("Não foi possível salvar as alterações.");
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', buscarUsuarios);
+    </script>
+</body>
+</html>

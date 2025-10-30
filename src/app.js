@@ -18,8 +18,31 @@ app.get("/", (req, res) => {
 
 // USUARIOS
 app.get("/usuarios", async (req, res) => {
-  const [results] = await pool.query("SELECT * FROM usuario");
-  res.send(results);
+  const { query } = req;
+  const pagina = Math.max(0, (Number(query.pagina) || 1) - 1);
+  const quantidade = Math.max(1, Number(query.quantidade) || 10);
+  const offset = pagina * quantidade;
+  try {
+    const [results] = await pool.query(
+      `SELECT 
+      usuario.id,
+      usuario.nome,
+      usuario.idade,
+      usuario.email,
+      usuario.senha
+      FROM
+      senai.usuario
+        ORDER BY 
+          senai.usuario.id asc 
+        LIMIT ? 
+        OFFSET ?
+        ; `,
+      [quantidade, offset]
+    );
+    res.send(results);
+  } catch (error) {
+    res.status(500).send({ error: 'Erro ao buscar usuario', details: error.message });
+  }
 });
 
 app.get("/usuarios/:id", async (req, res) => {
@@ -50,18 +73,18 @@ app.post("/usuarios", async (req, res) => {
   }
 });
 
-app.delete("/usuarios/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const [results] = await pool.query(
-      "DELETE FROM usuario WHERE idusuario=?",
-      id
-    );
-    res.status(200).send("Usuário deletado!", results);
-  } catch (error) {
-    console.log(error);
-  }
-});
+  app.delete("/usuarios/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const [results] = await pool.query(
+        "DELETE FROM usuario WHERE idusuario=?",
+        id
+      );
+      res.status(200).send("Usuário deletado!", results);
+    } catch (error) {
+      console.log(error);
+    }
+  });
 
 app.put("/usuarios/:id", async (req, res) => {
   try {
@@ -293,41 +316,47 @@ app.get("/logs/usuariosfull/:id", async (req, res) => {
 
 app.post("/likes", async (req, res) => {
   try {
-    const { body } = req;
+    const { log_id, user_id } = req.body;
+
     const [results] = await pool.query(
-      "INSERT INTO like (log_id, user_id) VALUES (?, ?)",
-      [
-        body.log_id,
-        body.user_id,
-      ]
+      "INSERT INTO `like` (log_id, user_id) VALUES (?, ?)",
+      [log_id, user_id]
     );
-    const [likeCriado] = await pool.query(
-      "SELECT * FROM like WHERE id=?",
-      results.insertId
+
+    await pool.query(
+      "UPDATE lgs SET likes = likes + 1 WHERE id = ?",
+      [log_id]
     );
-    res.status(201).json(likeCriado);
+
+    res.status(201).json({ message: "Like adicionado com sucesso!" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    res.status(500).json({ error: "Erro ao adicionar like", details: error.message });
   }
 });
-
 
 app.delete("/likes", async (req, res) => {
   try {
     const { log_id, user_id } = req.query;
+
+    // Remove the like from the `like` table
     const [results] = await pool.query(
-      "DELETE FROM `like` WHERE log_id = ? AND user_id = ? ",
-      [Number(log_id),
-      Number(user_id)]
+      "DELETE FROM `like` WHERE log_id = ? AND user_id = ?",
+      [Number(log_id), Number(user_id)]
     );
-    res.status(200).send("like removido!", results);
+
+    // Decrement the likes count in the `lgs` table
+    await pool.query(
+      "UPDATE lgs SET likes = likes - 1 WHERE id = ?",
+      [log_id]
+    );
+
+    res.status(200).json({ message: "Like removido com sucesso!" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    res.status(500).json({ error: "Erro ao remover like", details: error.message });
   }
 });
-
-
-
 
 
 app.listen(3000, () => {
