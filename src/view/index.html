@@ -34,7 +34,7 @@
             </div>
         </div>
     </nav>
-    <div class="container">
+    <div class="layout">
 
         <div class="card card-esquerdo" style="width: 18rem;">
             <div class="card-body">
@@ -56,8 +56,31 @@
 
 
 
-        <div class="card card-central">
-            <button>+Criar Novo Log</button>
+        <div class="card card-central" id="container-logs">
+    
+<button id="btn-criar-log">+Criar Novo Log</button>
+            <!-- Formulário para criar log -->
+            <div id="form-criar-log" style="display:none; margin-top:10px;">
+                <label>Categoria:</label>
+                <select id="categoria">
+                    <option value="Programação">Programação</option>
+                    <option value="Arte 3D/2D">Arte 3D/2D</option>
+                    <option value="Sound Design">Sound Design</option>
+                </select><br><br>
+
+                <label>Horas trabalhadas:</label>
+                <input type="number" id="horas_trabalhadas" min="0"><br><br>
+
+                <label>Linhas de código:</label>
+                <input type="number" id="linhas_codigo" min="0"><br><br>
+
+                <label>Bugs corrigidos:</label>
+                <input type="number" id="bugs_corrigidos" min="0"><br><br>
+
+                <button id="submit-log">Criar Log</button>
+            </div>
+            <div class="card card-central" id="container-logs">
+</div>
             <div class="card-body">
                 <div class="card-comments">
                     <div class="infos-user">
@@ -80,45 +103,169 @@
                                 <p>21 bugs Corrigidos</p>
                             </div>
                             <div class="likes-comentarios">
-                                <button>0👍</button>
+                                <button class="btn-like" data-logid="1" data-userid="1">0 👍</button>
                                 <p>12 🌪</p>
                             </div>
                         </div>
                         <label for="postar-comentario"></label>
                         <input type="text" id="postar-comentario" placeholder="Escreva um comentario.">
                         <button>Enviar</button>
-                        
+
                     </div>
                 </div>
             </div>
-            
+
 
         </div>
 
-        <div class="card card-direito">     
+        <div class="card card-direito">
             <div class="card-body">
                 <h5 class="card-title">Atividade recente</h5>
                 <div class="card-direito-usuario">
                     <img src="../img/image.png" alt="usuario">
                     <p>Nome</p>
                 </div>
-                   <div class="card-direito-usuario">
+                <div class="card-direito-usuario">
                     <img src="../img/image.png" alt="usuario">
                     <p>Nome</p>
                 </div>
                 <h5>Desenvolvedores em Destaque</h5>
-                    <div class="card-direito-usuario">
+                <div class="card-direito-usuario">
                     <img src="../img/image.png" alt="usuario">
                     <p>Nome</p>
                 </div>
-               <div class="card-direito-usuario">
+                <div class="card-direito-usuario">
                     <img src="../img/image.png" alt="usuario">
                     <p>Nome</p>
                 </div>
             </div>
         </div>
-
     </div>
+    <script>
+const userId = 1; // ID do usuário logado
+const userName = "Nome"; // Nome do usuário logado
+
+// Mostra/oculta o formulário
+document.getElementById("btn-criar-log").addEventListener("click", () => {
+    const form = document.getElementById("form-criar-log");
+    form.style.display = form.style.display === "none" ? "block" : "none";
+});
+
+// Função para criar o card do log
+function criarCardLog(log) {
+    card.innerHTML = `
+<div class="card-comments">
+    <div class="infos-user">
+        <img src="../img/image.png" alt="foto do usuario">
+        <div class="texto-user">
+            <p>${userName}</p>
+            <p>${new Date().toLocaleString()}</p>
+        </div>
+        <p id="filtro">${log.categoria}</p>
+    </div>
+    <div class="card-dentro-central">
+        <h4>${log.titulo || 'Título do Log'}</h4>
+        <p>${log.descricao || 'Horas trabalhadas, linhas de código e bugs corrigidos do log criado.'}</p>
+        <div class="hlb">
+            <p>${log.horas_trabalhadas} horas</p>
+            <p>${log.linhas_codigo} linhas</p>
+            <p>${log.bugs_corrigidos} bugs Corrigidos</p>
+        </div>
+        <div class="likes-comentarios">
+            <button class="btn-like" data-logid="${log.id}" data-userid="${userId}">0 👍</button>
+            <p>0 🌪</p>
+        </div>
+        <input type="text" placeholder="Escreva um comentario.">
+        <button>Enviar</button>
+    </div>
+</div>
+`;
+}
+
+// Evento do formulário de criação de log
+document.getElementById("submit-log").addEventListener("click", async () => {
+    const categoria = document.getElementById("categoria").value;
+    const horas_trabalhadas = Number(document.getElementById("horas_trabalhadas").value);
+    const linhas_codigo = Number(document.getElementById("linhas_codigo").value);
+    const bugs_corrigidos = Number(document.getElementById("bugs_corrigidos").value);
+
+    // Validação básica
+    const categoriasValidas = ["Programação", "Arte 3D/2D", "Sound Design"];
+    if (!categoriasValidas.includes(categoria) || isNaN(horas_trabalhadas) || isNaN(linhas_codigo) || isNaN(bugs_corrigidos)) {
+        alert("Preencha todos os campos corretamente e selecione uma categoria válida!");
+        return;
+    }
+
+    try {
+        const response = await fetch("http://localhost:3000/logs", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                id_user: userId,
+                categoria,
+                horas_trabalhadas,
+                linhas_codigo,
+                bugs_corrigidos
+            })
+        });
+
+        const novoLog = await response.json();
+        criarCardLog(novoLog);
+
+        // Limpa formulário e oculta
+        document.getElementById("form-criar-log").style.display = "none";
+        document.getElementById("horas_trabalhadas").value = "";
+        document.getElementById("linhas_codigo").value = "";
+        document.getElementById("bugs_corrigidos").value = "";
+
+    } catch (error) {
+        console.error("Erro ao criar log:", error);
+        alert("Erro ao criar log!");
+    }
+});
+
+// Função de like
+async function atualizarLikeBotao(botao) {
+    const log_id = Number(botao.dataset.logid);
+    const user_id = Number(botao.dataset.userid);
+
+    try {
+        const respToggle = await fetch("http://localhost:3000/likes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ log_id, user_id }),
+        });
+
+        const data = await respToggle.json();
+        console.log(data);
+
+        // Atualiza contador de likes
+        const respCount = await fetch(`http://localhost:3000/logs`);
+        const logs = await respCount.json();
+        const logAtual = logs.find(l => l.id === log_id);
+        if (logAtual) botao.innerText = `${logAtual.likes} 👍`;
+
+        botao.style.color = data.message.includes("adicionado") ? "blue" : "black";
+
+    } catch (error) {
+        console.error("Erro ao alternar like:", error);
+    }
+}
+
+// Inicializa likes dos cards existentes
+async function inicializarLikes() {
+    const botoes = document.querySelectorAll(".btn-like");
+    const respLogs = await fetch("http://localhost:3000/logs");
+    const logs = await respLogs.json();
+
+    botoes.forEach(botao => {
+        const log_id = Number(botao.dataset.logid);
+        const logAtual = logs.find(l => l.id === log_id);
+        if (logAtual) botao.innerText = `${logAtual.likes} 👍`;
+    });
+}
+document.addEventListener("DOMContentLoaded", inicializarLikes);
+</script>
 </body>
 
 </html>

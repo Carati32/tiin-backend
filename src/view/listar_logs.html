@@ -2,87 +2,108 @@
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logs</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logs</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
-    <div class="container my-4">
-        <div class="row justify-content-center g-4">
-          <div class="col-12 col-md-10 col-lg-8">
-            <div class="card text-dark">
-              <div class="card-body">
-                <table class="table table-dark table-striped-columns table-sm mb-0">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Categoria</th>
-                      <th>Horas Trabalhadas</th>
-                      <th>Linhas de Código</th>
-                      <th>Bugs Corrigidos</th>
-                    </tr>
-                  </thead>
-                  <tbody>
- 
-                  </tbody>
-                </table>
-              </div>
-            </div>
+  <div class="container my-4">
+    <div class="row justify-content-center g-4">
+      <div class="col-12 col-md-10 col-lg-8">
+        <div class="card text-dark">
+          <div class="card-body">
+            <h2 class="card-title text-center mb-4">Lista de Logs</h2>
+
+            <table class="table table-dark table-striped-columns table-sm mb-0">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Categoria</th>
+                  <th>Horas Trabalhadas</th>
+                  <th>Linhas de Código</th>
+                  <th>Bugs Corrigidos</th>
+                  <th>Likes</th>
+                  <th>Comentários</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
           </div>
         </div>
       </div>
+    </div>
 
-        <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">
-                <li class="page-item disabled">
-                    <a class="page-link">Previous</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">Next</a>
-                </li>
-            </ul>
-        </nav>
+    <nav aria-label="Page navigation example" class="mt-4">
+      <ul class="pagination justify-content-center">
+        <li class="page-item">
+          <button class="page-link" id="btnAnterior">Anterior</button>
+        </li>
+        <li class="page-item">
+          <button class="page-link" id="btnProximo">Próximo</button>
+        </li>
+      </ul>
+    </nav>
+  </div>
 
-        <script>
-            const url = 'http://localhost:3000/logs';
+  <script>
+    const TabelaCorpo = document.querySelector('tbody')
+    const btnAnterior = document.getElementById('btnAnterior')
+    const btnProximo = document.getElementById('btnProximo')
 
-            const TabelaCorpo = document.querySelector('tbody');
+    let paginaAtual = 1
+    const itensPorPagina = 10
+    let totalLogs = 0
 
-            async function buscarLogs() {
-                try {
-                    const response = await fetch(url);
-                    if (!response.ok) {
-                        throw new Error(`Erro na requisição: ${response.status}`);
-                    }
-                    const logs = await response.json();
+    async function buscarLogs() {
+      try {
+        const response = await fetch(`http://localhost:3000/logs?pagina=${paginaAtual}&quantidade=${itensPorPagina}`)
+        if (!response.ok) throw new Error('Erro ao buscar logs')
 
-                    TabelaCorpo.innerHTML = '';
+        const data = await response.json()
+        totalLogs = data.total
+        popularTabela(data.logs)
 
-                    logs.forEach(lgs => {
-                        const linha = document.createElement('tr');
-                        linha.innerHTML = `
-                        <td>${lgs.id}</td>
-                        <td>${lgs.categoria}</td>
-                        <td>${lgs.horas_trabalhadas}</td>
-                        <td>${lgs.linhas_codigo}</td>
-                        <td>${lgs.bugs_corrigidos}</td>
-                    `;
-                        TabelaCorpo.appendChild(linha);
-                    });
+        btnAnterior.disabled = paginaAtual === 1
+        btnProximo.disabled = paginaAtual * itensPorPagina >= totalLogs
 
-                } catch (error) {
-                    console.log('Falha ao buscar os logs:', error);
-                    TabelaCorpo.innerHTML = `<tr><td colspan="5">Erro ao carregar os dados.</td></tr>`;
-                }
-            }
-            buscarLogs()
-        </script>
+      } catch (error) {
+        console.error('Erro ao buscar logs:', error)
+        TabelaCorpo.innerHTML = `<tr><td colspan="7" class="text-center">Erro ao carregar logs.</td></tr>`
+      }
+    }
+    function popularTabela(logs) {
+      TabelaCorpo.innerHTML = ''
+      logs.forEach(log => {
+        const linha = document.createElement('tr')
+        linha.innerHTML = `
+            <td>${log.id}</td>
+            <td>${log.categoria}</td>
+            <td>${log.horas_trabalhadas}</td>
+            <td>${log.linhas_codigo}</td>
+            <td>${log.bugs_corrigidos}</td>
+            <td>${log.likes}</td>
+            <td>${log.qnt_comments}</td>
+        `
+        TabelaCorpo.appendChild(linha)
+      })
+    }
+
+    btnProximo.addEventListener('click', () => {
+      paginaAtual++
+      buscarLogs()
+    })
+
+    btnAnterior.addEventListener('click', () => {
+      if (paginaAtual > 1) {
+        paginaAtual--
+        buscarLogs()
+      }
+    })
+
+    document.addEventListener('DOMContentLoaded', buscarLogs)
+  </script>
 </body>
 
 </html>
