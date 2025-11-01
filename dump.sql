@@ -122,8 +122,11 @@ CREATE TABLE lgs (
     bugs_corrigidos INT,
     id_user INT,
     FOREIGN KEY (id_user) 
-    REFERENCES usuario (id)	
+    REFERENCES usuario(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
+
 
 INSERT INTO lgs (categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos, id_user) VALUES
 ('Backend', 8, 450, 3, 1),
@@ -230,13 +233,22 @@ INSERT INTO lgs (categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos, i
 SELECT * FROM lgs;
 
 CREATE TABLE `like` (
-  `log_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  KEY `fk_log_idx` (`log_id`),
-  KEY `fk_user_idx` (`user_id`),
-  CONSTRAINT `fk_log` FOREIGN KEY (`log_id`) REFERENCES `lgs` (`id`),
-  CONSTRAINT `fk_user` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id`)
+  log_id INT NOT NULL,
+  user_id INT NOT NULL,
+  KEY fk_log_idx (log_id),
+  KEY fk_user_idx (user_id),
+  CONSTRAINT fk_log 
+      FOREIGN KEY (log_id) 
+      REFERENCES lgs(id)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE,
+  CONSTRAINT fk_user 
+      FOREIGN KEY (user_id) 
+      REFERENCES usuario(id)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE
 );
+
 
 
 
@@ -370,17 +382,22 @@ INSERT INTO `like` (log_id, user_id) VALUES
 (100, 24);
 
 SELECT * FROM `like`;
-
-CREATE TABLE `comment`(
-	id INT PRIMARY KEY AUTO_INCREMENT,
-	id_log INT,
+CREATE TABLE `comment` (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_log INT,
     id_user INT,
     comments VARCHAR(255),
-	FOREIGN KEY (id_user)
-    REFERENCES usuario (id),
-	FOREIGN KEY (id_log)
-    REFERENCES lgs (id)
-);INSERT INTO comment (id_log, id_user, comments) VALUES
+    FOREIGN KEY (id_user)
+        REFERENCES usuario(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (id_log)
+        REFERENCES lgs(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+INSERT INTO comment (id_log, id_user, comments) VALUES
 (1, 2, 'Muito bom!'),
 (2, 1, 'Ótima implementação.'),
 (3, 4, 'Precisa melhorar a performance.'),
