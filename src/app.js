@@ -143,10 +143,10 @@ app.post("/login", async (req, res) => {
 
 // LOGS
 app.get("/logs", async (req, res) => {
-  const { query } = req
-  const pagina = Math.max(0, (Number(query.pagina) || 1) - 1)
-  const quantidade = Math.max(1, Number(query.quantidade) || 10)
-  const offset = pagina * quantidade
+  const { query } = req;
+  const pagina = Math.max(0, (Number(query.pagina) || 1) - 1);
+  const quantidade = Math.max(1, Number(query.quantidade) || 10);
+  const offset = pagina * quantidade;
 
   try {
     const [logs] = await pool.query(
@@ -158,29 +158,33 @@ app.get("/logs", async (req, res) => {
         lgs.horas_trabalhadas,
         lgs.linhas_codigo,
         lgs.bugs_corrigidos,
-        (SELECT COUNT(*) FROM senai.like WHERE senai.like.log_id = lgs.id) as likes,
-        (SELECT COUNT(*) FROM senai.comment WHERE senai.comment.id_log = lgs.id) as qnt_comments
+        lgs.id_user,
+        usuario.nome,
+        (SELECT COUNT(*) FROM senai.like WHERE senai.like.log_id = lgs.id) AS likes,
+        (SELECT COUNT(*) FROM senai.comment WHERE senai.comment.id_log = lgs.id) AS qnt_comments
       FROM senai.lgs
+      JOIN senai.usuario ON usuario.id = lgs.id_user
       ORDER BY lgs.id ASC
       LIMIT ? OFFSET ?`,
       [quantidade, offset]
-    )
+    );
 
-    const [totalRows] = await pool.query(`SELECT COUNT(*) as total FROM lgs`)
+    const [totalRows] = await pool.query(`SELECT COUNT(*) AS total FROM senai.lgs`);
 
     res.json({
       logs,
       total: totalRows[0].total
-    })
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar logs', details: error.message })
+    console.error("Erro ao buscar logs:", error);
+    res.status(500).json({ error: "Erro ao buscar logs", details: error.message });
   }
-})
-
+});
 app.post("/logs", async (req, res) => {
   try {
-    const { body } = req
+    const { body } = req;
 
+    // Inserção do novo log
     const [results] = await pool.query(
       `INSERT INTO lgs 
       (id_user, titulo, descricao, categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos) 
@@ -194,15 +198,35 @@ app.post("/logs", async (req, res) => {
         body.linhas_codigo,
         body.bugs_corrigidos
       ]
-    )
+    );
 
-    const [logCriado] = await pool.query("SELECT * FROM lgs WHERE id=?", [results.insertId])
-    res.status(201).json(logCriado)
+    // Busca o log recém-criado já com o nome do usuário
+    const [logCriado] = await pool.query(
+      `SELECT 
+        lgs.id,
+        lgs.titulo,
+        lgs.descricao,
+        lgs.categoria,
+        lgs.horas_trabalhadas,
+        lgs.linhas_codigo,
+        lgs.bugs_corrigidos,
+        lgs.id_user,
+        usuario.nome,
+        (SELECT COUNT(*) FROM senai.like WHERE senai.like.log_id = lgs.id) AS likes,
+        (SELECT COUNT(*) FROM senai.comment WHERE senai.comment.id_log = lgs.id) AS qnt_comments
+      FROM senai.lgs
+      JOIN senai.usuario ON usuario.id = lgs.id_user
+      WHERE lgs.id = ?`,
+      [results.insertId]
+    );
+
+    // Retorna o log como array (mantendo padrão do frontend)
+    res.status(201).json(logCriado);
   } catch (error) {
-    console.error("Erro ao criar log:", error)
-    res.status(500).json({ error: "Erro ao criar log", details: error.message })
+    console.error("Erro ao criar log:", error);
+    res.status(500).json({ error: "Erro ao criar log", details: error.message });
   }
-})
+});
 
 app.get("/logs/horas_trabalhadas/:id", async (req, res) => {
   const { id } = req.params
@@ -349,7 +373,6 @@ app.delete("/likes", async (req, res) => {
     res.status(500).json({ error: "Erro ao remover like", details: error.message })
   }
 })
-
 
 app.listen(3000, () => {
   console.log(`Servidor rodando na porta: 3000`)

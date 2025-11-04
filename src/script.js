@@ -6,7 +6,7 @@ let usuarioAtual = null; // guarda o usuário carregado
 document.getElementById("btn-criar-log").addEventListener("click", () => {
     const form = document.getElementById("form-criar-log");
     form.style.display = form.style.display === "none" ? "block" : "none";
-});
+}); 
 
 // =================== CRIAR CARD DE LOG ===================
 function criarCardLog(log) {
@@ -38,7 +38,7 @@ function criarCardLog(log) {
                 <button class="btn-like" data-logid="${log.id}" data-userid="${userId}">
                     ${log.likes || 0} 👍
                 </button>
-                <span style="margin-left: 5px;">${log.qnt_comments || 0}</span>
+                <span style="margin-left: 5px;">${log.qnt_comments || 0} 💬</span>
             </div>
         </div>
     `;
@@ -193,8 +193,48 @@ async function carregarUsuario(id) {
     }
 }
 
-// =================== INICIALIZAÇÃO ===================
-window.addEventListener("DOMContentLoaded", () => {
+
+async function carregarUsuarios() {
+    try {
+        const resposta = await fetch("http://localhost:3000/usuarios")
+        const data = await resposta.json()
+
+        const usuarios = data.usuarios
+        const atividadeContainer = document.getElementById("atividade-recente")
+        const destaqueContainer = document.getElementById("dev-destaque")
+
+        atividadeContainer.innerHTML = ""
+        destaqueContainer.innerHTML = ""
+
+        // Preenche os primeiros 2 → Atividade recente
+        usuarios.slice(0, 2).forEach(u => {
+            atividadeContainer.innerHTML += `
+                <div class="card-direito-usuario">
+                    <img src="../img/image.png" alt="usuario">
+                    <p>${u.nome}</p>
+                </div>
+            `
+        })
+
+        // Preenche os 2 próximos → Destaque
+        usuarios.slice(2, 4).forEach(u => {
+            destaqueContainer.innerHTML += `
+                <div class="card-direito-usuario">
+                    <img src="../img/image.png" alt="usuario">
+                    <p>${u.nome}</p>
+                </div>
+            `
+        })
+
+    } catch (erro) {
+        console.error("Erro ao carregar usuários:", erro)
+    }
+}
+
+carregarUsuarios()
+
+
+  window.addEventListener("DOMContentLoaded", () => {
     carregarLogInicial();
     carregarUsuario(userId);
 });
