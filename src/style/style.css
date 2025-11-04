@@ -177,3 +177,99 @@
         margin: 0 auto 20px auto;
     }
 }
+
+
+
+body {
+    background-color: #f5f5f5;
+    font-family: Arial, sans-serif;
+}
+
+.layout {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+}
+
+.card-esquerdo, .card-central {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 15px;
+}
+
+.card-esquerdo {
+    width: 250px;
+    flex-shrink: 0;
+}
+
+.card-central {
+    width: 600px;
+    flex-shrink: 0;
+}
+
+.card-comments {
+    border-bottom: 1px solid #ddd;
+    padding: 15px 0;
+}
+
+.infos-user {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.texto-user {
+    margin-left: 10px;
+}
+
+.texto-user p:first-child {
+    font-weight: bold;
+    margin: 0;
+}
+
+.texto-user p:last-child {
+    font-size: 12px;
+    color: gray;
+    margin: 0;
+}
+
+.card-dentro-central h4 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.card-dentro-central p {
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+.hlb {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.likes-comentarios {
+    margin-top: 10px;
+}
+
+.btn-like {
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-like:hover {
+    opacity: 0.9;
+}
+
+#form-criar-log {
+    margin-bottom: 20px;
+}

@@ -46,8 +46,11 @@ app.get("/usuarios", async (req, res) => {
 
 app.get("/usuarios/:id", async (req, res) => {
   const { id } = req.params
-  const [results] = await pool.query("SELECT * FROM usuario WHERE id=?", id)
-  res.send(results)
+  const [results] = await pool.query("SELECT * FROM usuario WHERE id=?", [id])
+  if (results.length === 0) {
+    return res.status(404).json({ message: "Usuário não encontrado" })
+  }
+  res.json(results[0])
 })
 
 app.post("/usuarios", async (req, res) => {
@@ -149,6 +152,8 @@ app.get("/logs", async (req, res) => {
     const [logs] = await pool.query(
       `SELECT 
         lgs.id,
+        lgs.titulo,
+        lgs.descricao,
         lgs.categoria,
         lgs.horas_trabalhadas,
         lgs.linhas_codigo,
@@ -175,14 +180,27 @@ app.get("/logs", async (req, res) => {
 app.post("/logs", async (req, res) => {
   try {
     const { body } = req
+
     const [results] = await pool.query(
-      "INSERT INTO lgs(id_user ,categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos) VALUES (?, ?, ?, ?, ?)",
-      [body.id_user, body.categoria, body.horas_trabalhadas, body.linhas_codigo, body.bugs_corrigidos]
+      `INSERT INTO lgs 
+      (id_user, titulo, descricao, categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [
+        body.id_user,
+        body.titulo,
+        body.descricao,
+        body.categoria,
+        body.horas_trabalhadas,
+        body.linhas_codigo,
+        body.bugs_corrigidos
+      ]
     )
-    const [logCriado] = await pool.query("SELECT * FROM lgs WHERE id=?", results.insertId)
+
+    const [logCriado] = await pool.query("SELECT * FROM lgs WHERE id=?", [results.insertId])
     res.status(201).json(logCriado)
   } catch (error) {
-    console.log(error)
+    console.error("Erro ao criar log:", error)
+    res.status(500).json({ error: "Erro ao criar log", details: error.message })
   }
 })
 
@@ -212,32 +230,39 @@ app.get("/logs/horas_trabalhadas/:id", async (req, res) => {
     res.status(500).json({ error: "Erro ao buscar horas trabalhadas do usuário" })
   }
 })
-
 app.get("/logs/:id", async (req, res) => {
-  const { id } = req.params
-  const { query } = req
-
-  const pagina = Math.max(0, (Number(query.pagina) || 1) - 1)
-  const quantidade = Math.max(1, Number(query.quantidade) || 10)
-  const offset = pagina * quantidade
+  const { id } = req.params;
 
   try {
-    const [results] = await pool.query(
-      `SELECT 
+    const [log] = await pool.query(`
+      SELECT 
         lgs.id,
-        id_user
-        FROM senai.lgs AS lgs
-      WHERE lgs.id_user = ?
-      ORDER BY lgs.id ASC
-      LIMIT ? OFFSET ?`,
-      [id, quantidade, offset]
-    )
-    res.send(results)
+        lgs.titulo,
+        lgs.descricao,
+        lgs.categoria,
+        lgs.horas_trabalhadas,
+        lgs.linhas_codigo,
+        lgs.bugs_corrigidos,
+        lgs.id_user,
+        usuario.nome,
+        (SELECT COUNT(*) FROM senai.like WHERE senai.like.log_id = lgs.id) AS likes,
+        (SELECT COUNT(*) FROM senai.comment WHERE senai.comment.id_log = lgs.id) AS qnt_comments
+      FROM senai.lgs
+      JOIN senai.usuario ON usuario.id = lgs.id_user
+      WHERE lgs.id = ?
+      LIMIT 1
+    `, [id]);
+
+    if (log.length === 0) {
+      return res.status(404).json({ message: "Log não encontrado" });
+    }
+
+    res.json(log[0]); // retorna o objeto diretamente, não dentro de array
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: "Erro ao buscar logs do usuário" })
+    console.error("Erro ao buscar log:", error);
+    res.status(500).json({ error: "Erro ao buscar log" });
   }
-})
+});
 
 app.get("/logs/bugs/:id", async (req, res) => {
   const { id } = req.params
@@ -318,12 +343,6 @@ app.delete("/likes", async (req, res) => {
       "DELETE FROM `like` WHERE log_id = ? AND user_id = ?",
       [Number(log_id), Number(user_id)]
     )
-
-    await pool.query(
-      "UPDATE lgs SET likes = likes - 1 WHERE id = ?",
-      [log_id]
-    )
-
     res.status(200).json({ message: "Like removido com sucesso!" })
   } catch (error) {
     console.error(error)
