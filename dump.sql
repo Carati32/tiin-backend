@@ -9,7 +9,8 @@ CREATE TABLE usuario(
     senha VARCHAR(100)
 );
 
-
+SELECT * FROM usuario;
+SELECT id, nome FROM usuario;
 
 INSERT INTO usuario (nome, idade, email, senha) VALUES
 ('Ana Souza', 23, 'ana.souza1@email.com', 'senha123'),
@@ -116,139 +117,129 @@ SELECT * FROM usuario;
 
 CREATE TABLE lgs (
 	id INT PRIMARY KEY AUTO_INCREMENT,
+    titulo VARCHAR (100),
+    descricao TEXT,
 	categoria TEXT,
     horas_trabalhadas INT,
     linhas_codigo INT,
     bugs_corrigidos INT,
     id_user INT,
     FOREIGN KEY (id_user) 
-    REFERENCES usuario(id)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
+    REFERENCES usuario (id)	
 );
 
-
-INSERT INTO lgs (categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos, id_user) VALUES
-('Backend', 8, 450, 3, 1),
-('Frontend', 6, 320, 1, 2),
-('DevOps', 10, 200, 2, 3),
-('Banco de Dados', 7, 150, 1, 4),
-('Fullstack', 9, 600, 4, 5),
-('Backend', 8, 480, 2, 6),
-('Frontend', 5, 310, 1, 7),
-('DevOps', 11, 220, 3, 8),
-('Banco de Dados', 7, 190, 2, 9),
-('Fullstack', 9, 540, 4, 10),
-('Backend', 8, 470, 3, 11),
-('Frontend', 6, 280, 2, 12),
-('DevOps', 10, 210, 3, 13),
-('Banco de Dados', 7, 160, 1, 14),
-('Fullstack', 9, 580, 5, 15),
-('Backend', 8, 490, 2, 16),
-('Frontend', 5, 300, 1, 17),
-('DevOps', 12, 240, 4, 18),
-('Banco de Dados', 6, 170, 1, 19),
-('Fullstack', 8, 550, 3, 20),
-('Backend', 9, 460, 2, 21),
-('Frontend', 6, 350, 1, 22),
-('DevOps', 11, 210, 2, 23),
-('Banco de Dados', 7, 180, 2, 24),
-('Fullstack', 10, 600, 4, 25),
-('Backend', 8, 500, 3, 26),
-('Frontend', 7, 330, 2, 27),
-('DevOps', 10, 220, 3, 28),
-('Banco de Dados', 6, 160, 1, 29),
-('Fullstack', 9, 570, 4, 30),
-('Backend', 8, 480, 3, 31),
-('Frontend', 6, 340, 2, 32),
-('DevOps', 11, 230, 3, 33),
-('Banco de Dados', 7, 180, 1, 34),
-('Fullstack', 9, 590, 5, 35),
-('Backend', 8, 460, 2, 36),
-('Frontend', 5, 300, 1, 37),
-('DevOps', 10, 210, 2, 38),
-('Banco de Dados', 7, 170, 2, 39),
-('Fullstack', 9, 550, 4, 40),
-('Backend', 8, 490, 3, 41),
-('Frontend', 6, 320, 1, 42),
-('DevOps', 11, 240, 3, 43),
-('Banco de Dados', 6, 190, 1, 44),
-('Fullstack', 9, 600, 5, 45),
-('Backend', 8, 480, 2, 46),
-('Frontend', 7, 310, 1, 47),
-('DevOps', 10, 250, 2, 48),
-('Banco de Dados', 7, 180, 2, 49),
-('Fullstack', 9, 570, 4, 50),
-('Backend', 8, 470, 3, 51),
-('Frontend', 6, 330, 2, 52),
-('DevOps', 11, 210, 3, 53),
-('Banco de Dados', 7, 160, 1, 54),
-('Fullstack', 10, 590, 5, 55),
-('Backend', 8, 450, 2, 56),
-('Frontend', 6, 310, 1, 57),
-('DevOps', 12, 230, 4, 58),
-('Banco de Dados', 7, 170, 1, 59),
-('Fullstack', 9, 600, 3, 60),
-('Backend', 9, 480, 2, 61),
-('Frontend', 7, 350, 2, 62),
-('DevOps', 10, 210, 3, 63),
-('Banco de Dados', 6, 180, 1, 64),
-('Fullstack', 9, 570, 4, 65),
-('Backend', 8, 490, 3, 66),
-('Frontend', 6, 340, 2, 67),
-('DevOps', 11, 230, 3, 68),
-('Banco de Dados', 7, 180, 2, 69),
-('Fullstack', 9, 590, 5, 70),
-('Backend', 8, 460, 2, 71),
-('Frontend', 5, 310, 1, 72),
-('DevOps', 10, 220, 2, 73),
-('Banco de Dados', 7, 160, 2, 74),
-('Fullstack', 9, 550, 4, 75),
-('Backend', 8, 490, 3, 76),
-('Frontend', 6, 330, 2, 77),
-('DevOps', 11, 210, 3, 78),
-('Banco de Dados', 7, 170, 1, 79),
-('Fullstack', 9, 580, 5, 80),
-('Backend', 8, 470, 2, 81),
-('Frontend', 6, 320, 2, 82),
-('DevOps', 12, 240, 3, 83),
-('Banco de Dados', 7, 190, 1, 84),
-('Fullstack', 9, 600, 4, 85),
-('Backend', 8, 480, 2, 86),
-('Frontend', 7, 340, 1, 87),
-('DevOps', 11, 230, 2, 88),
-('Banco de Dados', 6, 170, 2, 89),
-('Fullstack', 9, 590, 5, 90),
-('Backend', 8, 450, 3, 91),
-('Frontend', 6, 310, 1, 92),
-('DevOps', 10, 250, 2, 93),
-('Banco de Dados', 7, 180, 1, 94),
-('Fullstack', 9, 560, 4, 95),
-('Backend', 9, 470, 3, 96),
-('Frontend', 6, 330, 2, 97),
-('DevOps', 11, 220, 3, 98),
-('Banco de Dados', 7, 160, 2, 99),
-('Fullstack', 9, 580, 5, 100);
+INSERT INTO lgs (titulo, descricao, categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos, id_user) VALUES
+('Projeto 1', 'Descrição do projeto 1', 'Programação', 10, 500, 2, 1),
+('Projeto 2', 'Descrição do projeto 2', 'Arte 3D/2D', 8, 400, 0, 2),
+('Projeto 3', 'Descrição do projeto 3', 'Sound Design', 12, 0, 0, 3),
+('Projeto 4', 'Descrição do projeto 4', 'Programação', 15, 850, 5, 1),
+('Projeto 5', 'Descrição do projeto 5', 'Arte 3D/2D', 20, 0, 0, 2),
+('Projeto 6', 'Descrição do projeto 6', 'Sound Design', 18, 0, 1, 3),
+('Projeto 7', 'Descrição do projeto 7', 'Programação', 14, 700, 3, 1),
+('Projeto 8', 'Descrição do projeto 8', 'Arte 3D/2D', 9, 0, 0, 2),
+('Projeto 9', 'Descrição do projeto 9', 'Sound Design', 11, 0, 2, 3),
+('Projeto 10', 'Descrição do projeto 10', 'Programação', 16, 920, 4, 1),
+('Projeto 11', 'Descrição do projeto 11', 'Arte 3D/2D', 7, 0, 0, 2),
+('Projeto 12', 'Descrição do projeto 12', 'Sound Design', 10, 0, 0, 3),
+('Projeto 13', 'Descrição do projeto 13', 'Programação', 13, 640, 1, 1),
+('Projeto 14', 'Descrição do projeto 14', 'Arte 3D/2D', 9, 0, 0, 2),
+('Projeto 15', 'Descrição do projeto 15', 'Sound Design', 17, 0, 2, 3),
+('Projeto 16', 'Descrição do projeto 16', 'Programação', 18, 1000, 3, 1),
+('Projeto 17', 'Descrição do projeto 17', 'Arte 3D/2D', 10, 0, 0, 2),
+('Projeto 18', 'Descrição do projeto 18', 'Sound Design', 15, 0, 1, 3),
+('Projeto 19', 'Descrição do projeto 19', 'Programação', 12, 550, 2, 1),
+('Projeto 20', 'Descrição do projeto 20', 'Arte 3D/2D', 14, 0, 0, 2),
+('Projeto 21', 'Descrição do projeto 21', 'Sound Design', 8, 0, 0, 3),
+('Projeto 22', 'Descrição do projeto 22', 'Programação', 11, 610, 1, 1),
+('Projeto 23', 'Descrição do projeto 23', 'Arte 3D/2D', 17, 0, 0, 2),
+('Projeto 24', 'Descrição do projeto 24', 'Sound Design', 9, 0, 0, 3),
+('Projeto 25', 'Descrição do projeto 25', 'Programação', 19, 980, 4, 1),
+('Projeto 26', 'Descrição do projeto 26', 'Arte 3D/2D', 13, 0, 0, 2),
+('Projeto 27', 'Descrição do projeto 27', 'Sound Design', 7, 0, 0, 3),
+('Projeto 28', 'Descrição do projeto 28', 'Programação', 16, 800, 2, 1),
+('Projeto 29', 'Descrição do projeto 29', 'Arte 3D/2D', 12, 0, 0, 2),
+('Projeto 30', 'Descrição do projeto 30', 'Sound Design', 10, 0, 1, 3),
+('Projeto 31', 'Descrição do projeto 31', 'Programação', 14, 740, 3, 1),
+('Projeto 32', 'Descrição do projeto 32', 'Arte 3D/2D', 9, 0, 0, 2),
+('Projeto 33', 'Descrição do projeto 33', 'Sound Design', 13, 0, 2, 3),
+('Projeto 34', 'Descrição do projeto 34', 'Programação', 17, 900, 4, 1),
+('Projeto 35', 'Descrição do projeto 35', 'Arte 3D/2D', 11, 0, 0, 2),
+('Projeto 36', 'Descrição do projeto 36', 'Sound Design', 9, 0, 1, 3),
+('Projeto 37', 'Descrição do projeto 37', 'Programação', 20, 1050, 5, 1),
+('Projeto 38', 'Descrição do projeto 38', 'Arte 3D/2D', 15, 0, 0, 2),
+('Projeto 39', 'Descrição do projeto 39', 'Sound Design', 12, 0, 2, 3),
+('Projeto 40', 'Descrição do projeto 40', 'Programação', 13, 690, 2, 1),
+('Projeto 41', 'Descrição do projeto 41', 'Arte 3D/2D', 8, 0, 0, 2),
+('Projeto 42', 'Descrição do projeto 42', 'Sound Design', 11, 0, 1, 3),
+('Projeto 43', 'Descrição do projeto 43', 'Programação', 18, 970, 3, 1),
+('Projeto 44', 'Descrição do projeto 44', 'Arte 3D/2D', 10, 0, 0, 2),
+('Projeto 45', 'Descrição do projeto 45', 'Sound Design', 16, 0, 0, 3),
+('Projeto 46', 'Descrição do projeto 46', 'Programação', 15, 850, 2, 1),
+('Projeto 47', 'Descrição do projeto 47', 'Arte 3D/2D', 14, 0, 0, 2),
+('Projeto 48', 'Descrição do projeto 48', 'Sound Design', 9, 0, 0, 3),
+('Projeto 49', 'Descrição do projeto 49', 'Programação', 12, 580, 1, 1),
+('Projeto 50', 'Descrição do projeto 50', 'Arte 3D/2D', 17, 0, 0, 2),
+('Projeto 51', 'Descrição do projeto 51', 'Sound Design', 8, 0, 0, 3),
+('Projeto 52', 'Descrição do projeto 52', 'Programação', 19, 990, 3, 1),
+('Projeto 53', 'Descrição do projeto 53', 'Arte 3D/2D', 11, 0, 0, 2),
+('Projeto 54', 'Descrição do projeto 54', 'Sound Design', 10, 0, 1, 3),
+('Projeto 55', 'Descrição do projeto 55', 'Programação', 13, 650, 2, 1),
+('Projeto 56', 'Descrição do projeto 56', 'Arte 3D/2D', 16, 0, 0, 2),
+('Projeto 57', 'Descrição do projeto 57', 'Sound Design', 9, 0, 0, 3),
+('Projeto 58', 'Descrição do projeto 58', 'Programação', 17, 880, 4, 1),
+('Projeto 59', 'Descrição do projeto 59', 'Arte 3D/2D', 12, 0, 0, 2),
+('Projeto 60', 'Descrição do projeto 60', 'Sound Design', 15, 0, 1, 3),
+('Projeto 61', 'Descrição do projeto 61', 'Programação', 14, 720, 3, 1),
+('Projeto 62', 'Descrição do projeto 62', 'Arte 3D/2D', 8, 0, 0, 2),
+('Projeto 63', 'Descrição do projeto 63', 'Sound Design', 10, 0, 1, 3),
+('Projeto 64', 'Descrição do projeto 64', 'Programação', 18, 940, 2, 1),
+('Projeto 65', 'Descrição do projeto 65', 'Arte 3D/2D', 11, 0, 0, 2),
+('Projeto 66', 'Descrição do projeto 66', 'Sound Design', 13, 0, 0, 3),
+('Projeto 67', 'Descrição do projeto 67', 'Programação', 19, 1020, 5, 1),
+('Projeto 68', 'Descrição do projeto 68', 'Arte 3D/2D', 14, 0, 0, 2),
+('Projeto 69', 'Descrição do projeto 69', 'Sound Design', 12, 0, 2, 3),
+('Projeto 70', 'Descrição do projeto 70', 'Programação', 16, 860, 3, 1),
+('Projeto 71', 'Descrição do projeto 71', 'Arte 3D/2D', 9, 0, 0, 2),
+('Projeto 72', 'Descrição do projeto 72', 'Sound Design', 15, 0, 1, 3),
+('Projeto 73', 'Descrição do projeto 73', 'Programação', 13, 640, 2, 1),
+('Projeto 74', 'Descrição do projeto 74', 'Arte 3D/2D', 10, 0, 0, 2),
+('Projeto 75', 'Descrição do projeto 75', 'Sound Design', 8, 0, 0, 3),
+('Projeto 76', 'Descrição do projeto 76', 'Programação', 17, 910, 3, 1),
+('Projeto 77', 'Descrição do projeto 77', 'Arte 3D/2D', 12, 0, 0, 2),
+('Projeto 78', 'Descrição do projeto 78', 'Sound Design', 9, 0, 0, 3),
+('Projeto 79', 'Descrição do projeto 79', 'Programação', 20, 1100, 4, 1),
+('Projeto 80', 'Descrição do projeto 80', 'Arte 3D/2D', 13, 0, 0, 2),
+('Projeto 81', 'Descrição do projeto 81', 'Sound Design', 11, 0, 1, 3),
+('Projeto 82', 'Descrição do projeto 82', 'Programação', 14, 700, 2, 1),
+('Projeto 83', 'Descrição do projeto 83', 'Arte 3D/2D', 15, 0, 0, 2),
+('Projeto 84', 'Descrição do projeto 84', 'Sound Design', 10, 0, 0, 3),
+('Projeto 85', 'Descrição do projeto 85', 'Programação', 18, 950, 3, 1),
+('Projeto 86', 'Descrição do projeto 86', 'Arte 3D/2D', 9, 0, 0, 2),
+('Projeto 87', 'Descrição do projeto 87', 'Sound Design', 14, 0, 2, 3),
+('Projeto 88', 'Descrição do projeto 88', 'Programação', 16, 870, 2, 1),
+('Projeto 89', 'Descrição do projeto 89', 'Arte 3D/2D', 10, 0, 0, 2),
+('Projeto 90', 'Descrição do projeto 90', 'Sound Design', 13, 0, 1, 3),
+('Projeto 91', 'Descrição do projeto 91', 'Programação', 15, 820, 3, 1),
+('Projeto 92', 'Descrição do projeto 92', 'Arte 3D/2D', 8, 0, 0, 2),
+('Projeto 93', 'Descrição do projeto 93', 'Sound Design', 12, 0, 0, 3),
+('Projeto 94', 'Descrição do projeto 94', 'Programação', 19, 990, 4, 1),
+('Projeto 95', 'Descrição do projeto 95', 'Arte 3D/2D', 14, 0, 0, 2),
+('Projeto 96', 'Descrição do projeto 96', 'Sound Design', 9, 0, 1, 3),
+('Projeto 97', 'Descrição do projeto 97', 'Programação', 17, 930, 2, 1),
+('Projeto 98', 'Descrição do projeto 98', 'Arte 3D/2D', 11, 0, 0, 2),
+('Projeto 99', 'Descrição do projeto 99', 'Sound Design', 10, 0, 0, 3),
+('Projeto 100', 'Descrição do projeto 100', 'Programação', 20, 1050, 5, 1);
 
 SELECT * FROM lgs;
 
 CREATE TABLE `like` (
-  log_id INT NOT NULL,
-  user_id INT NOT NULL,
-  KEY fk_log_idx (log_id),
-  KEY fk_user_idx (user_id),
-  CONSTRAINT fk_log 
-      FOREIGN KEY (log_id) 
-      REFERENCES lgs(id)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE,
-  CONSTRAINT fk_user 
-      FOREIGN KEY (user_id) 
-      REFERENCES usuario(id)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE
+  `log_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  KEY `fk_log_idx` (`log_id`),
+  KEY `fk_user_idx` (`user_id`),
+  CONSTRAINT `fk_log` FOREIGN KEY (`log_id`) REFERENCES `lgs` (`id`),
+  CONSTRAINT `fk_user` FOREIGN KEY (`user_id`) REFERENCES `usuario` (`id`)
 );
-
 
 
 
@@ -382,20 +373,19 @@ INSERT INTO `like` (log_id, user_id) VALUES
 (100, 24);
 
 SELECT * FROM `like`;
-CREATE TABLE `comment` (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    id_log INT,
+
+CREATE TABLE `comment`(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	id_log INT,
     id_user INT,
     comments VARCHAR(255),
-    FOREIGN KEY (id_user)
-        REFERENCES usuario(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    FOREIGN KEY (id_log)
-        REFERENCES lgs(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+	FOREIGN KEY (id_user)
+    REFERENCES usuario (id),
+	FOREIGN KEY (id_log)
+    REFERENCES lgs (id)
 );
+
+
 
 INSERT INTO comment (id_log, id_user, comments) VALUES
 (1, 2, 'Muito bom!'),
