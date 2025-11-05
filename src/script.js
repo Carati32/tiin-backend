@@ -1,14 +1,11 @@
-// =================== CONFIGURAÇÕES INICIAIS ===================
-const userId = 8; // ID fixo do usuário logado
-let usuarioAtual = null; // guarda o usuário carregado
+const userId = 8; 
+let usuarioAtual = null; 
 
-// =================== MOSTRAR / OCULTAR FORMULÁRIO ===================
 document.getElementById("btn-criar-log").addEventListener("click", () => {
     const form = document.getElementById("form-criar-log");
     form.style.display = form.style.display === "none" ? "block" : "none";
 }); 
 
-// =================== CRIAR CARD DE LOG ===================
 function criarCardLog(log) {
     const container = document.getElementById("container-logs");
     const card = document.createElement("div");
@@ -44,12 +41,10 @@ function criarCardLog(log) {
     `;
     container.prepend(card);
 
-    // botão de like
     const botao = card.querySelector(".btn-like");
     botao.addEventListener("click", () => atualizarLikeBotao(botao));
 }
 
-// =================== CRIAR LOG ===================
 document.getElementById("submit-log").addEventListener("click", async () => {
     if (!usuarioAtual) {
         alert("Usuário ainda não carregado!");
@@ -74,7 +69,7 @@ document.getElementById("submit-log").addEventListener("click", async () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 id_user: usuarioAtual.id,
-                nome: usuarioAtual.nome, // ✅ nome do usuário logado
+                nome: usuarioAtual.nome, 
                 categoria,
                 titulo,
                 horas_trabalhadas,
@@ -87,7 +82,7 @@ document.getElementById("submit-log").addEventListener("click", async () => {
         const novoLog = await response.json();
         criarCardLog(novoLog[0]);
 
-        // Resetar formulário
+     
         document.getElementById("form-criar-log").style.display = "none";
         document.getElementById("horas_trabalhadas").value = "";
         document.getElementById("linhas_codigo").value = "";
@@ -101,7 +96,6 @@ document.getElementById("submit-log").addEventListener("click", async () => {
     }
 });
 
-// =================== ATUALIZAR LIKES ===================
 async function atualizarLikeBotao(botao) {
     const log_id = Number(botao.dataset.logid);
     const user_id = Number(botao.dataset.userid);
@@ -134,7 +128,6 @@ async function atualizarLikeBotao(botao) {
     }
 }
 
-// =================== CARREGAR LOG INICIAL ===================
 async function carregarLogInicial() {
     try {
         const response = await fetch("http://localhost:3000/logs/5");
@@ -148,7 +141,6 @@ async function carregarLogInicial() {
     }
 }
 
-// =================== FILTROS ===================
 const checkboxesFiltro = document.querySelectorAll('input[type="checkbox"]');
 checkboxesFiltro.forEach(checkbox => {
     checkbox.addEventListener('change', aplicarFiltros);
@@ -175,7 +167,6 @@ function exibirLogs(logs) {
     logs.forEach(log => criarCardLog(log));
 }
 
-// =================== CARREGAR USUÁRIO ===================
 async function carregarUsuario(id) {
     try {
         const resposta = await fetch(`http://localhost:3000/usuarios/${id}`);
@@ -206,7 +197,6 @@ async function carregarUsuarios() {
         atividadeContainer.innerHTML = ""
         destaqueContainer.innerHTML = ""
 
-        // Preenche os primeiros 2 → Atividade recente
         usuarios.slice(0, 2).forEach(u => {
             atividadeContainer.innerHTML += `
                 <div class="card-direito-usuario">
@@ -216,7 +206,6 @@ async function carregarUsuarios() {
             `
         })
 
-        // Preenche os 2 próximos → Destaque
         usuarios.slice(2, 4).forEach(u => {
             destaqueContainer.innerHTML += `
                 <div class="card-direito-usuario">

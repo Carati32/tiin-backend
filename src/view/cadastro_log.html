@@ -26,6 +26,14 @@
             <h3>Cadastro de Log</h3>
             <form>
                 <div class="mb-3">
+                    <label for="titulo" class="form-label">Título</label>
+                    <input type="text" class="form-control" id="titulo">
+                </div>
+                <div class="mb-3">
+                    <label for="descricao" class="form-label">Descrição</label>
+                    <input type="text" class="form-control" id="descricao">
+                </div>
+                <div class="mb-3">
                     <label for="categoria" class="form-label">Categoria</label>
                     <input type="text" class="form-control" id="categoria">
                 </div>
@@ -52,6 +60,8 @@
 
     document.getElementById('frmLog').addEventListener('submit', function (event) {
         event.preventDefault();
+        const titulo = document.getElementById('titulo').value;
+        const descricao = document.getElementById('descricao').value;
         const categoria = document.getElementById('categoria').value;
         const horas_trabalhadas = document.getElementById('horas_trabalhadas').value;
         const linhas_codigo = document.getElementById('linhas_codigo').value;
@@ -65,7 +75,7 @@
                 "Content-Type": "application/json",
                 "Accept": 'application/json'
             },
-            body: JSON.stringify({categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos })
+            body: JSON.stringify({titulo, descricao,categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos })
         })
             .then((res) => {
                 if (!res.ok)

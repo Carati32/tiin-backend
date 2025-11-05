@@ -103,23 +103,28 @@ app.put("/usuarios/:id", async (req, res) => {
 // REGISTRO E LOGIN
 app.post("/registrar", async (req, res) => {
   try {
-    const { body } = req
+    const { nome, idade, email, senha } = req.body;
+
     const [results] = await pool.query(
-      "INSERT INTO usuario (nome,idade, email, senha) VALUES (?,?,?,?)",
-      [body.nome, body.idade, body.email, body.senha]
-    )
+      "INSERT INTO usuario (nome, idade, email, senha) VALUES (?, ?, ?, ?)",
+      [nome, idade, email, senha]
+    );
 
     const [usuarioCriado] = await pool.query(
-      "Select * FROM usuario WHERE id'=?",
-      results.insertId
-    )
+      "SELECT * FROM usuario WHERE id = ?",
+      [results.insertId]
+    );
 
-    return res.status(201).json(usuarioCriado)
+    return res.status(201).json(usuarioCriado[0]);
   } catch (error) {
-    console.log(error)
-  }
-})
+    if (error.code === "ER_DUP_ENTRY") {
+      return res.status(400).json({ message: "E-mail já cadastrado!" });
+    }
 
+    console.error("Erro no cadastro:", error);
+    return res.status(500).json({ message: "Erro interno no servidor." });
+  }
+});
 app.post("/login", async (req, res) => {
   try {
     const { body } = req
@@ -184,7 +189,6 @@ app.post("/logs", async (req, res) => {
   try {
     const { body } = req;
 
-    // Inserção do novo log
     const [results] = await pool.query(
       `INSERT INTO lgs 
       (id_user, titulo, descricao, categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos) 
@@ -200,7 +204,6 @@ app.post("/logs", async (req, res) => {
       ]
     );
 
-    // Busca o log recém-criado já com o nome do usuário
     const [logCriado] = await pool.query(
       `SELECT 
         lgs.id,
@@ -220,7 +223,6 @@ app.post("/logs", async (req, res) => {
       [results.insertId]
     );
 
-    // Retorna o log como array (mantendo padrão do frontend)
     res.status(201).json(logCriado);
   } catch (error) {
     console.error("Erro ao criar log:", error);
@@ -281,7 +283,8 @@ app.get("/logs/:id", async (req, res) => {
       return res.status(404).json({ message: "Log não encontrado" });
     }
 
-    res.json(log[0]); // retorna o objeto diretamente, não dentro de array
+    res.json(log[0]); 
+    
   } catch (error) {
     console.error("Erro ao buscar log:", error);
     res.status(500).json({ error: "Erro ao buscar log" });

@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Logs</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body>
   <div class="container my-4">
     <div class="row justify-content-center g-4">
@@ -48,62 +46,78 @@
   </div>
 
   <script>
-    const TabelaCorpo = document.querySelector('tbody')
-    const btnAnterior = document.getElementById('btnAnterior')
-    const btnProximo = document.getElementById('btnProximo')
+    const url = 'http://localhost:3000/logs';
+    const TabelaCorpo = document.querySelector('tbody');
 
-    let paginaAtual = 1
-    const itensPorPagina = 10
-    let totalLogs = 0
+    let paginaAtual = 1;
+    const itensPorPagina = 10;
+    let totalLogs = 0;
+
+    const btnAnterior = document.getElementById('btnAnterior');
+    const btnProximo = document.getElementById('btnProximo');
 
     async function buscarLogs() {
       try {
-        const response = await fetch(`http://localhost:3000/logs?pagina=${paginaAtual}&quantidade=${itensPorPagina}`)
-        if (!response.ok) throw new Error('Erro ao buscar logs')
+        const response = await fetch(`${url}?pagina=${paginaAtual}&quantidade=${itensPorPagina}`);
+        if (!response.ok) throw new Error('Erro ao buscar logs');
 
-        const data = await response.json()
-        totalLogs = data.total
-        popularTabela(data.logs)
+        const data = await response.json();
+        totalLogs = data.total;
 
-        btnAnterior.disabled = paginaAtual === 1
-        btnProximo.disabled = paginaAtual * itensPorPagina >= totalLogs
-
+        popularTabela(data.logs);
+        atualizarPaginacao();
       } catch (error) {
-        console.error('Erro ao buscar logs:', error)
-        TabelaCorpo.innerHTML = `<tr><td colspan="7" class="text-center">Erro ao carregar logs.</td></tr>`
+        console.error("Erro ao buscar logs:", error);
+        TabelaCorpo.innerHTML = `<tr><td colspan="7" class="text-center">Erro ao carregar logs.</td></tr>`;
       }
     }
+
     function popularTabela(logs) {
-      TabelaCorpo.innerHTML = ''
+      TabelaCorpo.innerHTML = '';
       logs.forEach(log => {
-        const linha = document.createElement('tr')
+        const linha = document.createElement('tr');
         linha.innerHTML = `
-            <td>${log.id}</td>
-            <td>${log.categoria}</td>
-            <td>${log.horas_trabalhadas}</td>
-            <td>${log.linhas_codigo}</td>
-            <td>${log.bugs_corrigidos}</td>
-            <td>${log.likes}</td>
-            <td>${log.qnt_comments}</td>
-        `
-        TabelaCorpo.appendChild(linha)
-      })
+          <td>${log.id}</td>
+          <td>${log.categoria}</td>
+          <td>${log.horas_trabalhadas}</td>
+          <td>${log.linhas_codigo}</td>
+          <td>${log.bugs_corrigidos}</td>
+          <td>${log.likes}</td>
+          <td>${log.qnt_comments}</td>
+        `;
+        TabelaCorpo.appendChild(linha);
+      });
+    }
+
+    function atualizarPaginacao() {
+      const totalPaginas = Math.ceil(totalLogs / itensPorPagina);
+      btnAnterior.disabled = paginaAtual <= 1;
+      btnProximo.disabled = paginaAtual >= totalPaginas;
     }
 
     btnProximo.addEventListener('click', () => {
-      paginaAtual++
-      buscarLogs()
-    })
+      const totalPaginas = Math.ceil(totalLogs / itensPorPagina);
+
+      if (paginaAtual < totalPaginas) {
+        paginaAtual++;
+        atualizarPaginacao(); // 🔥 já desativa o botão antes de carregar
+        buscarLogs();
+      } else {
+        btnProximo.disabled = true; // 🔥 força desabilitar se clicar rápido
+      }
+    });
 
     btnAnterior.addEventListener('click', () => {
       if (paginaAtual > 1) {
-        paginaAtual--
-        buscarLogs()
+        paginaAtual--;
+        atualizarPaginacao();
+        buscarLogs();
+      } else {
+        btnAnterior.disabled = true;
       }
-    })
+    });
 
-    document.addEventListener('DOMContentLoaded', buscarLogs)
+    document.addEventListener('DOMContentLoaded', buscarLogs);
   </script>
 </body>
-
 </html>
